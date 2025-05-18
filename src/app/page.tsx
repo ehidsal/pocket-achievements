@@ -142,11 +142,11 @@ export default function HomePage() {
         <div className="inline-flex items-center space-x-3">
           <Coins className="h-12 w-12 text-primary" />
           <h1 className="text-5xl font-bold tracking-tight text-foreground">
-            Logros de <span className="text-primary">Bolsillo</span>
+            Pago<span className="text-primary">metro</span>
           </h1>
         </div>
         <p className="mt-3 text-lg text-muted-foreground">
-          Empoderando a los niños con responsabilidad, una tarea a la vez.
+          Cumple, Cobra, Ahorra.
         </p>
          <div className="mt-6">
           <Link href="/history" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90">
@@ -163,7 +163,7 @@ export default function HomePage() {
       </div>
 
       <footer className="mt-16 py-8 text-center text-muted-foreground text-sm border-t">
-        <p>&copy; {new Date().getFullYear()} Logros de Bolsillo. Todos los derechos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} Pagometro. Todos los derechos reservados.</p>
         <p>¡Diseñado para que las tareas sean divertidas y gratificantes!</p>
       </footer>
     </div>

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Logros de Bolsillo',
-  description: 'Gestiona las asignaciones de los niños basadas en la finalización de tareas.',
+  title: 'Pagometro',
+  description: 'Cumple, Cobra, Ahorra.',
 };
 
 export default function RootLayout({
