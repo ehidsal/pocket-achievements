@@ -10,32 +10,28 @@ import ColoredProgress from '@/components/shared/colored-progress';
 import AchievementList from '@/components/achievements/achievement-list';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Medal, Gem, ShieldCheck, Crown, Trophy, Edit3 } from 'lucide-react'; // Icons for levels
+import { Medal, Gem, ShieldCheck, Crown, Trophy, Edit3, Settings, CreditCard, Zap, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-
-interface ChildCardProps {
-  child: Child;
-}
+import {
+  linkParentStripeAccount,
+  linkChildDestinationAccount,
+  toggleMonthlyPayoutAuthorization
+} from '@/app/actions/stripe'; // Placeholder Stripe actions
 
 // Server Action (conceptual - no real implementation here, just for simulation)
 async function checkAndAwardAchievements(childId: string, completedTaskId: string): Promise<UnlockedAchievement[]> {
   console.log(`Simulando revisión de logros para el hijo ${childId} tras completar tarea ${completedTaskId}`);
-  // En una app real, aquí llamarías a tu Cloud Function o Server Action
-  // que revisa las condiciones y devuelve los nuevos logros desbloqueados.
-
-  // Simulación: desbloquear un logro de vez en cuando para prueba
-  if (Math.random() < 0.3) { // 30% de probabilidad de desbloquear un logro simulado
+  if (Math.random() < 0.3) {
     const simulatedNewAchievement: UnlockedAchievement = {
       id: `sim_ach_${Date.now()}`,
       achievementId: 'SIMULATED_ACHIEVEMENT',
       name: '¡Logro Desbloqueado!',
       description: 'Has hecho algo genial (simulado).',
-      iconName: 'Award', // Asegúrate que 'Award' esté en iconComponents en page.tsx
+      iconName: 'Award',
       dateUnlocked: new Date().toISOString(),
       type: 'Progreso',
     };
-    console.log("Logro simulado:", simulatedNewAchievement);
     return [simulatedNewAchievement];
   }
   return [];
@@ -46,10 +42,16 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
   const { toast } = useToast();
   const [child, setChild] = React.useState<Child>(initialChild);
   const [showAchievements, setShowAchievements] = React.useState(false);
+  const [showStripeSettings, setShowStripeSettings] = React.useState(false);
+  const [isStripeLoading, setIsStripeLoading] = React.useState(false);
   const avatarInputRef = React.useRef<HTMLInputElement>(null);
 
+
   React.useEffect(() => {
-    // Recalcular nivel si los logros cambian
+    setChild(initialChild); // Actualizar estado si initialChild cambia (ej: datos de Stripe)
+  }, [initialChild]);
+
+  React.useEffect(() => {
     const newLevel = calculateChildLevel(child.totalAchievementsUnlocked);
     if (newLevel !== child.level) {
       setChild(prevChild => ({ ...prevChild, level: newLevel }));
@@ -129,7 +131,6 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
           toast({
             title: "Avatar Actualizado (Temporalmente)",
             description: "El nuevo avatar se muestra. Este cambio es solo local y no se guardará.",
-            duration: 5000,
           });
         }
       };
@@ -140,6 +141,45 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
   const triggerAvatarUpload = () => {
     avatarInputRef.current?.click();
   };
+
+  // Placeholder Stripe action handlers
+  const handleLinkParentStripe = async () => {
+    setIsStripeLoading(true);
+    // Asumimos que child.userId es el ID del padre. En una app real, esto vendría del usuario autenticado.
+    const parentUserId = child.userId || "parent_placeholder_id";
+    const result = await linkParentStripeAccount(parentUserId);
+    toast({ title: "Vinculación Stripe (Padre)", description: result.message });
+    if (result.success && result.stripeCustomerId) {
+      setChild(prev => ({ ...prev, stripeCustomerId: result.stripeCustomerId }));
+    }
+    setIsStripeLoading(false);
+  };
+
+  const handleLinkChildDestination = async () => {
+    setIsStripeLoading(true);
+    const parentUserId = child.userId || "parent_placeholder_id";
+    // Simular recolección de datos bancarios (en una app real sería un formulario seguro de Stripe)
+    const mockAccountDetails = { iban: "ES00123412341234567890" };
+    const result = await linkChildDestinationAccount(parentUserId, child.id, mockAccountDetails);
+    toast({ title: "Vinculación Cuenta Destino (Hijo)", description: result.message });
+    if (result.success && result.stripeAccountId) {
+      setChild(prev => ({ ...prev, stripeAccountId: result.stripeAccountId }));
+    }
+    setIsStripeLoading(false);
+  };
+  
+  const handleTogglePayouts = async () => {
+    setIsStripeLoading(true);
+    const parentUserId = child.userId || "parent_placeholder_id";
+    const newAuthState = !child.payoutsAuthorized;
+    const result = await toggleMonthlyPayoutAuthorization(parentUserId, child.id, newAuthState);
+    toast({ title: "Autorización de Abonos", description: result.message });
+    if (result.success && result.payoutsAuthorized !== undefined) {
+      setChild(prev => ({ ...prev, payoutsAuthorized: result.payoutsAuthorized }));
+    }
+    setIsStripeLoading(false);
+  };
+
 
   const totalPotentialAllowance = child.monthlyAllowanceGoal;
   let totalEarnedAllowance = 0;
@@ -240,18 +280,80 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
           />
         ))}
       </CardContent>
-      <CardFooter className="p-6 flex flex-col items-start">
-        <Button onClick={() => setShowAchievements(!showAchievements)} variant="outline" className="mb-4">
-          {showAchievements ? 'Ocultar Logros' : 'Mostrar Logros'} ({child.unlockedAchievements.length})
-        </Button>
+      <Separator />
+      <CardFooter className="p-6 flex flex-col items-start space-y-4">
+        <div className="w-full flex justify-between items-center">
+           <Button onClick={() => setShowAchievements(!showAchievements)} variant="outline" size="sm">
+            {showAchievements ? 'Ocultar Logros' : 'Mostrar Logros'} ({child.unlockedAchievements.length})
+          </Button>
+          <Button onClick={() => setShowStripeSettings(!showStripeSettings)} variant="outline" size="sm">
+            <Settings className="mr-2 h-4 w-4" />
+            {showStripeSettings ? 'Ocultar Config. Pago' : 'Config. Pago (Stripe)'}
+          </Button>
+        </div>
+
         {showAchievements && (
-          <div className="w-full">
+          <div className="w-full pt-4 border-t">
             <h3 className="text-xl font-semibold mb-2 text-primary">Logros Desbloqueados</h3>
             {child.unlockedAchievements.length > 0 ? (
               <AchievementList achievements={child.unlockedAchievements} />
             ) : (
               <p className="text-muted-foreground">Aún no hay logros desbloqueados. ¡Sigue esforzándote!</p>
             )}
+          </div>
+        )}
+
+        {showStripeSettings && (
+          <div className="w-full pt-4 border-t space-y-3">
+            <h3 className="text-xl font-semibold mb-2 text-primary">Configuración de Pagos (Stripe)</h3>
+            <div className="text-sm space-y-2">
+              <p>
+                <span className="font-medium">ID Cliente Stripe (Padre):</span>{' '}
+                {child.stripeCustomerId ? child.stripeCustomerId : (
+                  <span className="text-muted-foreground italic">No vinculado</span>
+                )}
+              </p>
+              <p>
+                <span className="font-medium">Cuenta Destino (Hijo):</span>{' '}
+                {child.stripeAccountId ? child.stripeAccountId : (
+                  <span className="text-muted-foreground italic">No vinculada</span>
+                )}
+              </p>
+              <p className="flex items-center">
+                <span className="font-medium">Abonos Mensuales Automáticos:</span>{' '}
+                {child.payoutsAuthorized ? (
+                  <CheckCircle2 className="h-5 w-5 text-green-600 ml-2" />
+                ) : (
+                  <AlertTriangle className="h-5 w-5 text-yellow-500 ml-2" />
+                )}
+                <span className={cn("ml-1", child.payoutsAuthorized ? "text-green-700" : "text-yellow-600")}>
+                  {child.payoutsAuthorized ? 'Autorizados' : 'No Autorizados'}
+                </span>
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 pt-2">
+              {!child.stripeCustomerId && (
+                <Button onClick={handleLinkParentStripe} disabled={isStripeLoading} variant="outline" size="sm">
+                  <CreditCard className="mr-2 h-4 w-4"/>
+                  {isStripeLoading ? "Vinculando..." : "Vincular Cuenta Padre (Stripe)"}
+                </Button>
+              )}
+              {child.stripeCustomerId && !child.stripeAccountId && (
+                 <Button onClick={handleLinkChildDestination} disabled={isStripeLoading} variant="outline" size="sm">
+                  <CreditCard className="mr-2 h-4 w-4"/>
+                  {isStripeLoading ? "Vinculando..." : "Vincular Cuenta Hijo (Stripe)"}
+                </Button>
+              )}
+              {child.stripeCustomerId && child.stripeAccountId && (
+                <Button onClick={handleTogglePayouts} disabled={isStripeLoading} variant="outline" size="sm">
+                  <Zap className="mr-2 h-4 w-4"/>
+                  {isStripeLoading ? "Actualizando..." : (child.payoutsAuthorized ? 'Desautorizar Abonos' : 'Autorizar Abonos')}
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground pt-2">
+              Nota: Estas son acciones simuladas. La integración real con Stripe requiere configuración de backend.
+            </p>
           </div>
         )}
       </CardFooter>

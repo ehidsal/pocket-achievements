@@ -35,7 +35,7 @@ export interface Category {
 
 export interface Child {
   id:string;
-  userId?: string;
+  userId?: string; // ID del padre/usuario al que pertenece el niño
   name: string;
   birthDate: string;
   monthlyAllowanceGoal: number;
@@ -45,35 +45,53 @@ export interface Child {
   level: ChildLevel;
   unlockedAchievements: UnlockedAchievement[];
   totalAchievementsUnlocked: number;
+
+  // Campos para Stripe (conceptuales, el customerId estaría en el perfil del padre)
+  stripeCustomerId?: string; // ID del Customer de Stripe para el padre
+  stripeAccountId?: string;  // ID de la Cuenta Conectada o Cuenta Externa de Stripe para el hijo
+  payoutsAuthorized?: boolean; // Si el padre autorizó abonos automáticos para este hijo
 }
 
 export interface IconMap {
   [key: string]: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
 }
 
-// New types for Payment History
+// Tipos para Historial de Pagos y Evaluaciones
 export interface EvaluationCategoryDetail {
   categoryId: string;
   categoryName: string;
   iconName: string;
   earned: number;
   potential: number;
-  compliancePercentage: number; // Specific to this category for the week
+  compliancePercentage: number;
 }
 
 export interface EvaluationEntry {
-  id: string; // Unique ID for the evaluation period (e.g., week)
+  id: string;
   childId: string;
-  weekStartDate: string; // ISO string, e.g., "2024-05-20"
-  compliancePercentage: number; // Overall compliance for the week (0-100)
-  generatedAllowance: number; // Amount earned this week
+  weekStartDate: string;
+  compliancePercentage: number;
+  generatedAllowance: number;
   currency: 'EUR' | 'USD';
-  predominantCategory?: EvaluationCategoryDetail; // Optional: The category that contributed most or was focused on
-  categoryDetails: EvaluationCategoryDetail[]; // Detailed breakdown per category
+  predominantCategory?: EvaluationCategoryDetail;
+  categoryDetails: EvaluationCategoryDetail[];
 }
 
 export interface HistoryFiltersState {
   dateRange?: { from?: Date; to?: Date };
   selectedCategoryId?: string;
-  minCompliance: number; // 0-100
+  minCompliance: number;
+}
+
+// Tipo para Registro de Abonos
+export interface Payout {
+  id: string; // ID del documento en Firestore
+  childId: string;
+  userId: string; // ID del padre
+  amount: number;
+  currency: 'EUR' | 'USD';
+  payoutDate: string; // ISO string de la fecha del abono
+  status: 'pending' | 'succeeded' | 'failed' | 'cancelled';
+  stripeTransferId?: string; // ID de la transferencia o payout en Stripe
+  errorMessage?: string; // En caso de fallo
 }

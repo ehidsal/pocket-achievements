@@ -7,7 +7,6 @@ import type { Child } from '@/types';
 import { Coins, BookOpen, Home as HomeIcon, Users, Heart, HelpCircle, Award, Target, TrendingUp, CheckCircle, History } from 'lucide-react';
 import type { IconMap } from '@/types';
 
-// It's important that iconComponents includes all icons used by name in child data or achievement data
 export const iconComponents: IconMap = {
   BookOpen: BookOpen,
   HomeIcon: HomeIcon,
@@ -15,11 +14,11 @@ export const iconComponents: IconMap = {
   Heart: Heart,
   Coins: Coins,
   HelpCircle: HelpCircle,
-  Award: Award, // For achievements
-  Target: Target, // For achievements
-  TrendingUp: TrendingUp, // For achievements
-  CheckCircle: CheckCircle, // For achievements
-  History: History, // For History page link
+  Award: Award,
+  Target: Target,
+  TrendingUp: TrendingUp,
+  CheckCircle: CheckCircle,
+  History: History,
 };
 
 export const childrenData: Child[] = [
@@ -28,7 +27,7 @@ export const childrenData: Child[] = [
     name: 'Alex Miller',
     birthDate: '2015-07-20',
     monthlyAllowanceGoal: 50,
-    avatarUrl: 'https://placehold.co/100x100.png',
+    avatarUrl: 'https://placehold.co/100x100/E08A0B/444.png?text=AM',
     currency: 'EUR',
     level: 'Bronce',
     totalAchievementsUnlocked: 2,
@@ -84,13 +83,17 @@ export const childrenData: Child[] = [
         ],
       },
     ],
+    // Datos de Stripe simulados
+    stripeCustomerId: 'cus_padreAlex123',
+    stripeAccountId: 'acct_hijoAlex456',
+    payoutsAuthorized: true,
   },
   {
     id: 'child2',
     name: 'Jamie Lee',
     birthDate: '2012-03-10',
     monthlyAllowanceGoal: 70,
-    avatarUrl: 'https://placehold.co/100x100.png',
+    avatarUrl: 'https://placehold.co/100x100/E05A0B/FFF.png?text=JL',
     currency: 'USD',
     level: 'Novato',
     totalAchievementsUnlocked: 0,
@@ -132,6 +135,10 @@ export const childrenData: Child[] = [
         ],
       },
     ],
+     // Datos de Stripe simulados
+    stripeCustomerId: 'cus_padreJamie789', // Diferente ID de cliente para el padre de Jamie
+    stripeAccountId: undefined, // Jamie aún no tiene cuenta vinculada
+    payoutsAuthorized: false,
   },
 ];
 
