@@ -10,19 +10,34 @@ import { cn } from '@/lib/utils';
 interface TaskItemProps {
   task: Task;
   onTaskToggle: (taskId: string, completed: boolean) => void;
+  disabled?: boolean;
 }
 
-const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskToggle }) => {
+const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskToggle, disabled = false }) => {
   const uniqueId = React.useId();
   return (
-    <div className="flex items-center space-x-3 py-2 px-1 hover:bg-secondary/50 rounded-md transition-colors duration-150">
+    <div className={cn(
+        "flex items-center space-x-3 py-2 px-1 rounded-md transition-colors duration-150",
+        !disabled && "hover:bg-secondary/50",
+        disabled && "opacity-70 cursor-not-allowed"
+      )}>
       <Checkbox
         id={`${uniqueId}-${task.id}`}
         checked={task.completed}
         onCheckedChange={(checked) => onTaskToggle(task.id, !!checked)}
         aria-labelledby={`label-${uniqueId}-${task.id}`}
+        disabled={disabled}
       />
-      <Label htmlFor={`${uniqueId}-${task.id}`} id={`label-${uniqueId}-${task.id}`} className={cn("flex-grow cursor-pointer text-sm", task.completed && "line-through text-muted-foreground")}>
+      <Label 
+        htmlFor={`${uniqueId}-${task.id}`} 
+        id={`label-${uniqueId}-${task.id}`} 
+        className={cn(
+          "flex-grow text-sm", 
+          !disabled && "cursor-pointer",
+          disabled && "cursor-not-allowed",
+          task.completed && "line-through text-muted-foreground"
+        )}
+      >
         {task.name}
       </Label>
       {task.completed ? (

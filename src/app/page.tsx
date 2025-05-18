@@ -18,6 +18,7 @@ const childrenData: Child[] = [
         name: 'Responsabilidades Escolares',
         icon: BookOpen,
         weight: 0.4,
+        isActive: true,
         tasks: [
           { id: 'task1_1_1', name: 'Terminar la tarea a tiempo', completed: false, value: 10 },
           { id: 'task1_1_2', name: 'Leer durante 20 minutos', completed: true, value: 5 },
@@ -29,6 +30,7 @@ const childrenData: Child[] = [
         name: 'Tareas Familiares',
         icon: HomeIcon,
         weight: 0.3,
+        isActive: true,
         tasks: [
           { id: 'task1_2_1', name: 'Hacer la cama todas las mañanas', completed: false, value: 10 },
           { id: 'task1_2_2', name: 'Ayudar a poner la mesa para la cena', completed: false, value: 8 },
@@ -40,6 +42,7 @@ const childrenData: Child[] = [
         name: 'Habilidades Sociales',
         icon: Users,
         weight: 0.15,
+        isActive: true,
         tasks: [
           { id: 'task1_3_1', name: 'Compartir juguetes con hermano/amigo', completed: false, value: 10 },
           { id: 'task1_3_2', name: 'Decir "por favor" y "gracias"', completed: true, value: 5 },
@@ -50,6 +53,7 @@ const childrenData: Child[] = [
         name: 'Metas de Comportamiento',
         icon: Heart,
         weight: 0.15,
+        isActive: true,
         tasks: [
           { id: 'task1_4_1', name: 'Escuchar a la primera cuando se le pida', completed: false, value: 15 },
           { id: 'task1_4_2', name: 'Manejar la frustración con calma', completed: false, value: 10 },
@@ -69,6 +73,7 @@ const childrenData: Child[] = [
         name: 'Logros Académicos',
         icon: BookOpen,
         weight: 0.5,
+        isActive: true,
         tasks: [
           { id: 'task2_1_1', name: 'Completar la hoja de trabajo de matemáticas', completed: true, value: 10 },
           { id: 'task2_1_2', name: 'Estudiar para el examen de ciencias', completed: false, value: 15 },
@@ -80,6 +85,7 @@ const childrenData: Child[] = [
         name: 'Contribuciones en el Hogar',
         icon: HomeIcon,
         weight: 0.3,
+        isActive: true,
         tasks: [
           { id: 'task2_2_1', name: 'Pasear al perro', completed: false, value: 10 },
           { id: 'task2_2_2', name: 'Ayudar a desempacar las compras', completed: true, value: 5 },
@@ -91,6 +97,7 @@ const childrenData: Child[] = [
         name: 'Desarrollo Personal',
         icon: Users,
         weight: 0.2,
+        isActive: true,
         tasks: [
           { id: 'task2_3_1', name: 'Practicar una nueva habilidad durante 15 minutos', completed: false, value: 10 },
           { id: 'task2_3_2', name: 'Ayudar a un miembro de la familia sin que se lo pidan', completed: false, value: 10 },

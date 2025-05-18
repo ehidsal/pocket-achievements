@@ -34,14 +34,28 @@ const ChildCard: React.FC<ChildCardProps> = ({ child }) => {
     );
   };
 
+  const handleCategoryActivityToggle = (categoryId: string, newIsActiveState: boolean) => {
+    setInternalCategories(prevCategories =>
+      prevCategories.map(category =>
+        category.id === categoryId
+          ? { ...category, isActive: newIsActiveState }
+          : category
+      )
+    );
+  };
+  
   const totalPotentialAllowance = child.monthlyAllowanceGoal;
   let totalEarnedAllowance = 0;
 
   internalCategories.forEach(category => {
-    const completedTasksValue = category.tasks.reduce((sum, task) => sum + (task.completed ? task.value : 0), 0);
-    const totalTasksValue = category.tasks.reduce((sum, task) => sum + task.value, 0);
-    const categoryProgress = totalTasksValue > 0 ? (completedTasksValue / totalTasksValue) : 0;
-    totalEarnedAllowance += child.monthlyAllowanceGoal * category.weight * categoryProgress;
+    if (category.isActive) { // Solo considerar categorías activas
+      const completedTasksValue = category.tasks.reduce((sum, task) => sum + (task.completed ? task.value : 0), 0);
+      const totalTasksValue = category.tasks.reduce((sum, task) => sum + task.value, 0);
+      // El progreso de la categoría se calcula sobre el valor total de sus tareas, no sobre el peso.
+      const categoryTaskCompletionProgress = totalTasksValue > 0 ? (completedTasksValue / totalTasksValue) : 0;
+      // La contribución de esta categoría a la asignación total es su peso * progreso de tareas * meta mensual.
+      totalEarnedAllowance += child.monthlyAllowanceGoal * category.weight * categoryTaskCompletionProgress;
+    }
   });
   
   const overallProgressPercentage = totalPotentialAllowance > 0 ? (totalEarnedAllowance / totalPotentialAllowance) * 100 : 0;
@@ -85,6 +99,7 @@ const ChildCard: React.FC<ChildCardProps> = ({ child }) => {
             category={category}
             childMonthlyAllowanceGoal={child.monthlyAllowanceGoal}
             onTaskToggle={handleTaskToggle}
+            onCategoryActivityToggle={handleCategoryActivityToggle}
           />
         ))}
       </CardContent>

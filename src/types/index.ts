@@ -13,6 +13,7 @@ export interface Category {
   icon: LucideIcon;
   tasks: Task[];
   weight: number; // e.g., 0.4 for 40% of total allowance
+  isActive: boolean; // Indicates if the category is currently active for the child
 }
 
 export interface Child {
