@@ -52,7 +52,7 @@ const ChildCard: React.FC<ChildCardProps> = ({ child }) => {
         <div className="flex items-start space-x-4">
           <Image
             src={child.avatarUrl}
-            alt={`${child.name}'s avatar`}
+            alt={`Avatar de ${child.name}`}
             width={80}
             height={80}
             className="rounded-full border-2 border-primary shadow-sm"
@@ -61,14 +61,14 @@ const ChildCard: React.FC<ChildCardProps> = ({ child }) => {
           <div className="flex-grow">
             <CardTitle className="text-3xl font-bold text-primary">{child.name}</CardTitle>
             <CardDescription className="text-base text-muted-foreground mt-1">
-              {age} years old
+              {age} años
             </CardDescription>
              <div className="mt-3">
               <p className="text-sm font-medium text-foreground">
-                Monthly Allowance Goal: <span className="font-bold text-accent">${totalPotentialAllowance.toFixed(2)}</span>
+                Meta de Asignación Mensual: <span className="font-bold text-accent">${totalPotentialAllowance.toFixed(2)}</span>
               </p>
               <p className="text-lg font-semibold text-foreground">
-                Currently Earned: <span className="font-bold text-green-600">${totalEarnedAllowance.toFixed(2)}</span>
+                Ganado Actualmente: <span className="font-bold text-green-600">${totalEarnedAllowance.toFixed(2)}</span>
               </p>
               <ColoredProgress value={overallProgressPercentage} className="mt-2" heightClassName="h-3" />
             </div>

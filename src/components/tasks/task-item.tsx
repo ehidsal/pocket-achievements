@@ -26,9 +26,9 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onTaskToggle }) => {
         {task.name}
       </Label>
       {task.completed ? (
-        <Star className="h-5 w-5 text-primary" fill="currentColor" aria-label="Completed" />
+        <Star className="h-5 w-5 text-primary" fill="currentColor" aria-label="Completada" />
       ) : (
-        <Circle className="h-5 w-5 text-muted-foreground/50" aria-label="Pending" />
+        <Circle className="h-5 w-5 text-muted-foreground/50" aria-label="Pendiente" />
       )}
     </div>
   );

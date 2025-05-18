@@ -32,11 +32,11 @@ const TaskCategory: React.FC<TaskCategoryProps> = ({ category, childMonthlyAllow
             <CardTitle className="text-xl font-semibold">{name}</CardTitle>
           </div>
           <Badge variant="secondary" className="text-sm">
-            {completedTasks}/{totalTasks} tasks
+            {completedTasks}/{totalTasks} tareas
           </Badge>
         </div>
         <CardDescription className="mt-1 text-xs">
-           Potential: ${maxCategoryEarnings.toFixed(2)} | Earned: ${earnedInCategory.toFixed(2)}
+           Potencial: ${maxCategoryEarnings.toFixed(2)} | Ganado: ${earnedInCategory.toFixed(2)}
         </CardDescription>
       </CardHeader>
       <CardContent>

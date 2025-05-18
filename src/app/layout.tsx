@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Pocket Achievements',
-  description: 'Manage children\'s allowances based on task completion.',
+  title: 'Logros de Bolsillo',
+  description: 'Gestiona las asignaciones de los niños basadas en la finalización de tareas.',
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <div className="min-h-screen bg-background text-foreground">
           {children}
