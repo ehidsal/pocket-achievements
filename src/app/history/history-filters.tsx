@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { format, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { DateRange } from 'react-day-picker';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface HistoryFiltersProps {
   filters: HistoryFiltersState;
@@ -136,11 +137,5 @@ const HistoryFilters: React.FC<HistoryFiltersProps> = ({ filters, setFilters, ca
     </Card>
   );
 };
-
-
-// Need to import Card, CardHeader, CardTitle, CardContent from "@/components/ui/card";
-// This was missed in thought process for this specific component.
-// Adding them here as they are used.
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default HistoryFilters;
