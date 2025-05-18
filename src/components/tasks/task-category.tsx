@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from 'react';
@@ -9,6 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { iconComponents } from '@/app/page'; // Importa el mapeo de iconos
+import { HelpCircle } from 'lucide-react'; // Icono de fallback
 
 interface TaskCategoryProps {
   category: Category;
@@ -25,8 +28,11 @@ const TaskCategory: React.FC<TaskCategoryProps> = ({
   onCategoryActivityToggle,
   onTaskActivityToggle
 }) => {
-  const { id: categoryId, name, icon: Icon, tasks, weight, isActive: isCategoryActive } = category;
+  const { id: categoryId, name, iconName, tasks, weight, isActive: isCategoryActive } = category;
   const categoryCheckboxId = React.useId();
+
+  // Obtener el componente de icono dinámicamente
+  const IconComponent = iconComponents[iconName] || HelpCircle;
 
   const activeTasks = tasks.filter(task => task.isActive);
   const completedActiveTasks = activeTasks.filter(task => task.completed);
@@ -53,7 +59,7 @@ const TaskCategory: React.FC<TaskCategoryProps> = ({
               aria-labelledby={`label-cat-${categoryCheckboxId}-${categoryId}`}
               className="mr-2"
             />
-            <Icon className={cn("h-6 w-6", isCategoryActive ? "text-primary" : "text-muted-foreground")} />
+            <IconComponent className={cn("h-6 w-6", isCategoryActive ? "text-primary" : "text-muted-foreground")} />
             <Label htmlFor={`${categoryCheckboxId}-${categoryId}`} id={`label-cat-${categoryCheckboxId}-${categoryId}`} className="cursor-pointer">
               <CardTitle className={cn("text-xl font-semibold", !isCategoryActive && "text-muted-foreground line-through")}>{name}</CardTitle>
             </Label>
@@ -83,6 +89,7 @@ const TaskCategory: React.FC<TaskCategoryProps> = ({
               />
             ))}
           </div>
+          {/* Aquí podrías añadir un botón "Añadir Tarea" que abra un formulario/modal */}
         </CardContent>
       )}
     </Card>
