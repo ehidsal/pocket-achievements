@@ -1,39 +1,33 @@
 
-"use client"; // This page uses client-side state for task interactions
+"use client"; 
 
 import ChildCard from '@/components/children/child-card';
 import type { Child } from '@/types';
 import { Coins, BookOpen, Home as HomeIcon, Users, Heart } from 'lucide-react';
 import type { IconMap } from '@/types';
 
-// Mapeo de nombres de iconos a componentes Lucide.
-// Deberías expandir esto según los iconos que uses.
 export const iconComponents: IconMap = {
   BookOpen: BookOpen,
-  HomeIcon: HomeIcon, // O simplemente 'Home' si quieres usar el nombre directo de Lucide
+  HomeIcon: HomeIcon, 
   Users: Users,
   Heart: Heart,
   Coins: Coins,
-  // Añade más iconos aquí según sea necesario
-  HelpCircle: require('lucide-react').HelpCircle, // Ejemplo de fallback o icono por defecto
+  HelpCircle: require('lucide-react').HelpCircle, 
 };
 
-
-// Mock Data - Actualizado para usar iconName y añadir campos opcionales a las tareas
-// En una aplicación real, estos datos vendrían de Firestore y ya tendrían userId asociado al Child.
 const childrenData: Child[] = [
   {
-    id: 'child1', // Este sería el ID del documento en Firestore
-    // userId: 'parentId1', // En un caso real, se asociaría al usuario
+    id: 'child1',
     name: 'Alex Miller',
     birthDate: '2015-07-20',
     monthlyAllowanceGoal: 50,
     avatarUrl: 'https://placehold.co/100x100.png',
+    currency: 'EUR', // Moneda para Alex
     categories: [
       {
         id: 'cat1_1',
         name: 'Responsabilidades Escolares',
-        iconName: 'BookOpen', // Usar el nombre del icono como string
+        iconName: 'BookOpen', 
         weight: 0.4,
         isActive: true,
         tasks: [
@@ -45,7 +39,7 @@ const childrenData: Child[] = [
       {
         id: 'cat1_2',
         name: 'Tareas Familiares',
-        iconName: 'HomeIcon', // Usar el nombre del icono como string
+        iconName: 'HomeIcon', 
         weight: 0.3,
         isActive: true,
         tasks: [
@@ -57,7 +51,7 @@ const childrenData: Child[] = [
       {
         id: 'cat1_3',
         name: 'Habilidades Sociales',
-        iconName: 'Users', // Usar el nombre del icono como string
+        iconName: 'Users', 
         weight: 0.15,
         isActive: true,
         tasks: [
@@ -68,7 +62,7 @@ const childrenData: Child[] = [
       {
         id: 'cat1_4',
         name: 'Metas de Comportamiento',
-        iconName: 'Heart', // Usar el nombre del icono como string
+        iconName: 'Heart', 
         weight: 0.15,
         isActive: true,
         tasks: [
@@ -80,11 +74,11 @@ const childrenData: Child[] = [
   },
   {
     id: 'child2',
-    // userId: 'parentId1', // En un caso real
     name: 'Jamie Lee',
     birthDate: '2012-03-10',
     monthlyAllowanceGoal: 70,
     avatarUrl: 'https://placehold.co/100x100.png',
+    currency: 'USD', // Moneda para Jamie
     categories: [
       {
         id: 'cat2_1',
@@ -126,12 +120,6 @@ const childrenData: Child[] = [
 ];
 
 export default function HomePage() {
-  // En una aplicación real, aquí se obtendrían los datos de los hijos del usuario autenticado desde Firestore.
-  // const [children, setChildren] = React.useState<Child[]>([]);
-  // React.useEffect(() => {
-  //   // Lógica para cargar datos de Firestore
-  // }, []);
-
   return (
     <div className="container mx-auto px-4 py-8">
       <header className="mb-10 text-center">

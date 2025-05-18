@@ -9,13 +9,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
-import { iconComponents } from '@/app/page'; // Importa el mapeo de iconos
-import { HelpCircle } from 'lucide-react'; // Icono de fallback
+import { cn, formatCurrency } from '@/lib/utils';
+import { iconComponents } from '@/app/page'; 
+import { HelpCircle } from 'lucide-react'; 
 
 interface TaskCategoryProps {
   category: Category;
   childMonthlyAllowanceGoal: number;
+  childCurrency: 'EUR' | 'USD'; // Nueva prop para la moneda del niño
   onTaskToggle: (categoryId: string, taskId: string, completed: boolean) => void;
   onCategoryActivityToggle: (categoryId: string, isActive: boolean) => void;
   onTaskActivityToggle: (categoryId: string, taskId: string, taskIsActive: boolean) => void;
@@ -24,6 +25,7 @@ interface TaskCategoryProps {
 const TaskCategory: React.FC<TaskCategoryProps> = ({ 
   category, 
   childMonthlyAllowanceGoal, 
+  childCurrency,
   onTaskToggle, 
   onCategoryActivityToggle,
   onTaskActivityToggle
@@ -31,7 +33,6 @@ const TaskCategory: React.FC<TaskCategoryProps> = ({
   const { id: categoryId, name, iconName, tasks, weight, isActive: isCategoryActive } = category;
   const categoryCheckboxId = React.useId();
 
-  // Obtener el componente de icono dinámicamente
   const IconComponent = iconComponents[iconName] || HelpCircle;
 
   const activeTasks = tasks.filter(task => task.isActive);
@@ -71,7 +72,7 @@ const TaskCategory: React.FC<TaskCategoryProps> = ({
           )}
         </div>
         <CardDescription className={cn("mt-1 text-xs", !isCategoryActive && "text-muted-foreground")}>
-           Potencial: ${isCategoryActive ? maxCategoryEarnings.toFixed(2) : '0.00'} | Ganado: ${earnedInCategory.toFixed(2)}
+           Potencial: {formatCurrency(isCategoryActive ? maxCategoryEarnings : 0, childCurrency)} | Ganado: {formatCurrency(earnedInCategory, childCurrency)}
            {!isCategoryActive && " (Categoría desactivada)"}
         </CardDescription>
       </CardHeader>
@@ -85,11 +86,10 @@ const TaskCategory: React.FC<TaskCategoryProps> = ({
                 task={task}
                 onTaskToggle={(taskId, completed) => onTaskToggle(categoryId, taskId, completed)}
                 onTaskActivityToggle={(taskId, taskIsActive) => onTaskActivityToggle(categoryId, taskId, taskIsActive)}
-                disabled={!isCategoryActive} // TaskItem is disabled if the whole category is disabled
+                disabled={!isCategoryActive} 
               />
             ))}
           </div>
-          {/* Aquí podrías añadir un botón "Añadir Tarea" que abra un formulario/modal */}
         </CardContent>
       )}
     </Card>

@@ -1,9 +1,10 @@
+
 "use client";
 
 import * as React from 'react';
 import Image from 'next/image';
 import type { Child, Category as CategoryType, Task } from '@/types';
-import { calculateAge } from '@/lib/utils';
+import { calculateAge, formatCurrency } from '@/lib/utils';
 import TaskCategory from '@/components/tasks/task-category';
 import ColoredProgress from '@/components/shared/colored-progress';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -96,10 +97,10 @@ const ChildCard: React.FC<ChildCardProps> = ({ child }) => {
             </CardDescription>
              <div className="mt-3">
               <p className="text-sm font-medium text-foreground">
-                Meta de Asignación Mensual: <span className="font-bold text-accent">${totalPotentialAllowance.toFixed(2)}</span>
+                Meta de Asignación Mensual: <span className="font-bold text-accent">{formatCurrency(totalPotentialAllowance, child.currency)}</span>
               </p>
               <p className="text-lg font-semibold text-foreground">
-                Ganado Actualmente: <span className="font-bold text-green-600">${totalEarnedAllowance.toFixed(2)}</span>
+                Ganado Actualmente: <span className="font-bold text-green-600">{formatCurrency(totalEarnedAllowance, child.currency)}</span>
               </p>
               <ColoredProgress value={overallProgressPercentage} className="mt-2" heightClassName="h-3" />
             </div>
@@ -115,6 +116,7 @@ const ChildCard: React.FC<ChildCardProps> = ({ child }) => {
             key={category.id}
             category={category}
             childMonthlyAllowanceGoal={child.monthlyAllowanceGoal}
+            childCurrency={child.currency} // Pasar la moneda del niño
             onTaskToggle={handleTaskToggle}
             onCategoryActivityToggle={handleCategoryActivityToggle}
             onTaskActivityToggle={handleTaskActivityToggle}
