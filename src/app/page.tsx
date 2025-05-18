@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -6,6 +5,7 @@ import ChildCard from '@/components/children/child-card';
 import type { Child } from '@/types';
 import { Coins, BookOpen, Home as HomeIcon, Users, Heart, HelpCircle, Award, Target, TrendingUp, CheckCircle, History } from 'lucide-react';
 import type { IconMap } from '@/types';
+import { ThemeToggleButton } from '@/components/ui/theme-toggle-button'; // Nueva importación
 
 export const iconComponents: IconMap = {
   BookOpen: BookOpen,
@@ -24,6 +24,7 @@ export const iconComponents: IconMap = {
 export const childrenData: Child[] = [
   {
     id: 'child1',
+    userId: 'parent1',
     name: 'Alex Miller',
     birthDate: '2015-07-20',
     monthlyAllowanceGoal: 50,
@@ -83,13 +84,13 @@ export const childrenData: Child[] = [
         ],
       },
     ],
-    // Datos de Stripe simulados
     stripeCustomerId: 'cus_padreAlex123',
     stripeAccountId: 'acct_hijoAlex456',
     payoutsAuthorized: true,
   },
   {
     id: 'child2',
+    userId: 'parent2',
     name: 'Jamie Lee',
     birthDate: '2012-03-10',
     monthlyAllowanceGoal: 70,
@@ -135,9 +136,8 @@ export const childrenData: Child[] = [
         ],
       },
     ],
-     // Datos de Stripe simulados
-    stripeCustomerId: 'cus_padreJamie789', // Diferente ID de cliente para el padre de Jamie
-    stripeAccountId: undefined, // Jamie aún no tiene cuenta vinculada
+    stripeCustomerId: 'cus_padreJamie789',
+    stripeAccountId: undefined, 
     payoutsAuthorized: false,
   },
 ];
@@ -145,17 +145,20 @@ export const childrenData: Child[] = [
 export default function HomePage() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <header className="mb-10 text-center">
-        <div className="inline-flex items-center space-x-3">
-          <Coins className="h-12 w-12 text-primary" />
-          <h1 className="text-5xl font-bold tracking-tight text-foreground">
-            Pago<span className="text-primary">metro</span>
-          </h1>
+      <header className="mb-10">
+        <div className="flex justify-between items-center mb-3">
+          <div className="inline-flex items-center space-x-3">
+            <Coins className="h-12 w-12 text-primary" />
+            <h1 className="text-5xl font-bold tracking-tight text-foreground">
+              Pago<span className="text-primary">metro</span>
+            </h1>
+          </div>
+          <ThemeToggleButton /> {/* Botón de cambio de tema añadido aquí */}
         </div>
-        <p className="mt-3 text-lg text-muted-foreground">
+        <p className="text-lg text-muted-foreground text-center">
           Cumple, Cobra, Ahorra.
         </p>
-         <div className="mt-6">
+         <div className="mt-6 text-center">
           <Link href="/history" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90">
             <History className="mr-2 h-5 w-5" />
             Ver Historial de Pagos
