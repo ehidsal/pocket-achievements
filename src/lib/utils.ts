@@ -2,6 +2,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { differenceInYears } from 'date-fns';
+import type { ChildLevel } from '@/types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -36,4 +37,34 @@ export function formatCurrency(amount: number, currencyCode: 'EUR' | 'USD', loca
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
+}
+
+/**
+ * Calculates the child's level based on the number of achievements unlocked.
+ * @param achievementCount The total number of achievements unlocked by the child.
+ * @returns The calculated level as a string.
+ */
+export function calculateChildLevel(achievementCount: number): ChildLevel {
+  if (achievementCount >= 10) return 'Leyenda';
+  if (achievementCount >= 6) return 'Oro';
+  if (achievementCount >= 3) return 'Plata';
+  if (achievementCount >= 1) return 'Bronce'; // Adjusted to give Bronze for at least 1 achievement
+  return 'Novato'; // Default level if 0 achievements
+}
+
+export function getLevelColor(level: ChildLevel): string {
+  switch (level) {
+    case 'Novato':
+      return 'text-gray-500';
+    case 'Bronce':
+      return 'text-yellow-600'; // More like bronze
+    case 'Plata':
+      return 'text-gray-400'; // More like silver
+    case 'Oro':
+      return 'text-yellow-400'; // Gold
+    case 'Leyenda':
+      return 'text-purple-500'; // Legendary purple
+    default:
+      return 'text-foreground';
+  }
 }

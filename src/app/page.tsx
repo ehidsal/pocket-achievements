@@ -1,18 +1,23 @@
 
-"use client"; 
+"use client";
 
 import ChildCard from '@/components/children/child-card';
 import type { Child } from '@/types';
-import { Coins, BookOpen, Home as HomeIcon, Users, Heart } from 'lucide-react';
+import { Coins, BookOpen, Home as HomeIcon, Users, Heart, HelpCircle, Award, Target, TrendingUp, CheckCircle } from 'lucide-react';
 import type { IconMap } from '@/types';
 
+// It's important that iconComponents includes all icons used by name in child data or achievement data
 export const iconComponents: IconMap = {
   BookOpen: BookOpen,
-  HomeIcon: HomeIcon, 
+  HomeIcon: HomeIcon,
   Users: Users,
   Heart: Heart,
   Coins: Coins,
-  HelpCircle: require('lucide-react').HelpCircle, 
+  HelpCircle: HelpCircle,
+  Award: Award, // For achievements
+  Target: Target, // For achievements
+  TrendingUp: TrendingUp, // For achievements
+  CheckCircle: CheckCircle, // For achievements
 };
 
 const childrenData: Child[] = [
@@ -22,16 +27,22 @@ const childrenData: Child[] = [
     birthDate: '2015-07-20',
     monthlyAllowanceGoal: 50,
     avatarUrl: 'https://placehold.co/100x100.png',
-    currency: 'EUR', // Moneda para Alex
+    currency: 'EUR',
+    level: 'Bronce',
+    totalAchievementsUnlocked: 2,
+    unlockedAchievements: [
+      { id: 'ach1_1', achievementId: 'FIRST_TASK_COMPLETED', name: '¡Primer Paso!', description: 'Completaste tu primera tarea.', iconName: 'Award', dateUnlocked: '2024-05-10', type: 'Progreso' },
+      { id: 'ach1_2', achievementId: 'FIVE_TASKS_IN_CATEGORY', name: 'Especialista Escolar', description: 'Completaste 5 tareas en la categoría Escuela.', iconName: 'BookOpen', dateUnlocked: '2024-05-15', type: 'Completista' },
+    ],
     categories: [
       {
         id: 'cat1_1',
         name: 'Responsabilidades Escolares',
-        iconName: 'BookOpen', 
+        iconName: 'BookOpen',
         weight: 0.4,
         isActive: true,
         tasks: [
-          { id: 'task1_1_1', name: 'Terminar la tarea a tiempo', completed: false, value: 10, isActive: true, creadaPorUsuario: false, frequency: 'diaria' },
+          { id: 'task1_1_1', name: 'Terminar la tarea a tiempo', completed: true, value: 10, isActive: true, creadaPorUsuario: false, frequency: 'diaria' },
           { id: 'task1_1_2', name: 'Leer durante 20 minutos', completed: true, value: 5, isActive: true, creadaPorUsuario: false, frequency: 'diaria' },
           { id: 'task1_1_3', name: 'Preparar la mochila para el día siguiente', completed: false, value: 5, isActive: true, creadaPorUsuario: false, frequency: 'diaria' },
         ],
@@ -39,11 +50,11 @@ const childrenData: Child[] = [
       {
         id: 'cat1_2',
         name: 'Tareas Familiares',
-        iconName: 'HomeIcon', 
+        iconName: 'HomeIcon',
         weight: 0.3,
         isActive: true,
         tasks: [
-          { id: 'task1_2_1', name: 'Hacer la cama todas las mañanas', completed: false, value: 10, isActive: true, creadaPorUsuario: false, frequency: 'diaria' },
+          { id: 'task1_2_1', name: 'Hacer la cama todas las mañanas', completed: true, value: 10, isActive: true, creadaPorUsuario: false, frequency: 'diaria' },
           { id: 'task1_2_2', name: 'Ayudar a poner la mesa para la cena', completed: false, value: 8, isActive: true, creadaPorUsuario: false, frequency: 'semanal' },
           { id: 'task1_2_3', name: 'Ordenar los juguetes antes de dormir', completed: true, value: 7, isActive: true, creadaPorUsuario: false, frequency: 'diaria' },
         ],
@@ -51,7 +62,7 @@ const childrenData: Child[] = [
       {
         id: 'cat1_3',
         name: 'Habilidades Sociales',
-        iconName: 'Users', 
+        iconName: 'Users',
         weight: 0.15,
         isActive: true,
         tasks: [
@@ -62,7 +73,7 @@ const childrenData: Child[] = [
       {
         id: 'cat1_4',
         name: 'Metas de Comportamiento',
-        iconName: 'Heart', 
+        iconName: 'Heart',
         weight: 0.15,
         isActive: true,
         tasks: [
@@ -78,7 +89,10 @@ const childrenData: Child[] = [
     birthDate: '2012-03-10',
     monthlyAllowanceGoal: 70,
     avatarUrl: 'https://placehold.co/100x100.png',
-    currency: 'USD', // Moneda para Jamie
+    currency: 'USD',
+    level: 'Novato',
+    totalAchievementsUnlocked: 0,
+    unlockedAchievements: [],
     categories: [
       {
         id: 'cat2_1',
@@ -87,7 +101,7 @@ const childrenData: Child[] = [
         weight: 0.5,
         isActive: true,
         tasks: [
-          { id: 'task2_1_1', name: 'Completar la hoja de trabajo de matemáticas', completed: true, value: 10, isActive: true, creadaPorUsuario: false, frequency: 'diaria' },
+          { id: 'task2_1_1', name: 'Completar la hoja de trabajo de matemáticas', completed: false, value: 10, isActive: true, creadaPorUsuario: false, frequency: 'diaria' },
           { id: 'task2_1_2', name: 'Estudiar para el examen de ciencias', completed: false, value: 15, isActive: true, creadaPorUsuario: false, frequency: 'semanal' },
           { id: 'task2_1_3', name: 'Practicar instrumento musical durante 30 minutos', completed: false, value: 10, isActive: true, creadaPorUsuario: false, frequency: 'diaria' },
         ],
@@ -139,7 +153,7 @@ export default function HomePage() {
           <ChildCard key={child.id} child={child} />
         ))}
       </div>
-      
+
       <footer className="mt-16 py-8 text-center text-muted-foreground text-sm border-t">
         <p>&copy; {new Date().getFullYear()} Logros de Bolsillo. Todos los derechos reservados.</p>
         <p>¡Diseñado para que las tareas sean divertidas y gratificantes!</p>
