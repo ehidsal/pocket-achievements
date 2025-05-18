@@ -10,9 +10,9 @@ import ColoredProgress from '@/components/shared/colored-progress';
 import AchievementList from '@/components/achievements/achievement-list';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Medal, Gem, ShieldCheck, Crown, Trophy } from 'lucide-react'; // Icons for levels
+import { Medal, Gem, ShieldCheck, Crown, Trophy, Edit3 } from 'lucide-react'; // Icons for levels
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button"; // For "Ver Logros" button
+import { Button } from "@/components/ui/button";
 
 interface ChildCardProps {
   child: Child;
@@ -46,6 +46,7 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
   const { toast } = useToast();
   const [child, setChild] = React.useState<Child>(initialChild);
   const [showAchievements, setShowAchievements] = React.useState(false);
+  const avatarInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     // Recalcular nivel si los logros cambian
@@ -59,7 +60,6 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
   const age = calculateAge(child.birthDate);
 
   const handleTaskToggle = async (categoryId: string, taskId: string, completed: boolean) => {
-    // Update task completion state locally first for responsiveness
     const updatedCategories = child.categories.map(category =>
       category.id === categoryId
         ? {
@@ -72,8 +72,7 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
     );
     setChild(prevChild => ({ ...prevChild, categories: updatedCategories }));
 
-    // Simulate calling server to check for achievements
-    if (completed) { // Only check for achievements when a task is completed
+    if (completed) {
       const newlyUnlocked = await checkAndAwardAchievements(child.id, taskId);
       if (newlyUnlocked.length > 0) {
         newlyUnlocked.forEach(ach => {
@@ -83,7 +82,6 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
             duration: 5000,
           });
         });
-        // Update child state with new achievements and total count
         setChild(prevChild => ({
           ...prevChild,
           unlockedAchievements: [...prevChild.unlockedAchievements, ...newlyUnlocked],
@@ -121,6 +119,28 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
     }));
   };
 
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setChild(prevChild => ({ ...prevChild, avatarUrl: e.target!.result as string }));
+          toast({
+            title: "Avatar Actualizado (Temporalmente)",
+            description: "El nuevo avatar se muestra. Este cambio es solo local y no se guardará.",
+            duration: 5000,
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerAvatarUpload = () => {
+    avatarInputRef.current?.click();
+  };
+
   const totalPotentialAllowance = child.monthlyAllowanceGoal;
   let totalEarnedAllowance = 0;
 
@@ -146,7 +166,7 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
       case 'Plata': return <ShieldCheck className="h-5 w-5 text-gray-400" />;
       case 'Oro': return <Gem className="h-5 w-5 text-yellow-400" />;
       case 'Leyenda': return <Crown className="h-5 w-5 text-purple-500" />;
-      default: return <Trophy className="h-5 w-5 text-gray-500" />; // Novato
+      default: return <Trophy className="h-5 w-5 text-gray-500" />;
     }
   };
 
@@ -154,14 +174,32 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
     <Card className="w-full max-w-2xl mx-auto shadow-lg rounded-xl overflow-hidden">
       <CardHeader className="bg-card/50 p-6">
         <div className="flex items-start space-x-4">
-          <Image
-            src={child.avatarUrl}
-            alt={`Avatar de ${child.name}`}
-            width={80}
-            height={80}
-            className="rounded-full border-2 border-primary shadow-sm"
-            data-ai-hint="child avatar"
-          />
+          <div className="relative group">
+            <Image
+              src={child.avatarUrl}
+              alt={`Avatar de ${child.name}`}
+              width={80}
+              height={80}
+              className="rounded-full border-2 border-primary shadow-sm"
+              data-ai-hint={child.avatarUrl.startsWith('https://placehold.co') ? "child avatar" : undefined}
+            />
+            <input
+              type="file"
+              ref={avatarInputRef}
+              onChange={handleAvatarChange}
+              accept="image/*"
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute bottom-0 right-0 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-background/70 hover:bg-background"
+              onClick={triggerAvatarUpload}
+              title="Cambiar avatar"
+            >
+              <Edit3 className="h-4 w-4" />
+            </Button>
+          </div>
           <div className="flex-grow">
             <CardTitle className="text-3xl font-bold text-primary">{child.name}</CardTitle>
             <CardDescription className="text-base text-muted-foreground mt-1">
