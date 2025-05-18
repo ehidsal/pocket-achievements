@@ -5,7 +5,6 @@ import ChildCard from '@/components/children/child-card';
 import type { Child } from '@/types';
 import { Coins, BookOpen, Home as HomeIcon, Users, Heart, HelpCircle, Award, Target, TrendingUp, CheckCircle, History } from 'lucide-react';
 import type { IconMap } from '@/types';
-import { ThemeToggleButton } from '@/components/ui/theme-toggle-button'; // Nueva importación
 
 export const iconComponents: IconMap = {
   BookOpen: BookOpen,
@@ -153,7 +152,7 @@ export default function HomePage() {
               Pago<span className="text-primary">metro</span>
             </h1>
           </div>
-          <ThemeToggleButton /> {/* Botón de cambio de tema añadido aquí */}
+          {/* ThemeToggleButton removido de aquí */}
         </div>
         <p className="text-lg text-muted-foreground text-center">
           Cumple, Cobra, Ahorra.
