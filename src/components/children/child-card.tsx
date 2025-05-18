@@ -8,6 +8,7 @@ import { calculateAge, formatCurrency, calculateChildLevel, getLevelColor, cn } 
 import TaskCategory from '@/components/tasks/task-category';
 import ColoredProgress from '@/components/shared/colored-progress';
 import AchievementList from '@/components/achievements/achievement-list';
+import CreateTaskForm from '@/components/tasks/create-task-form'; // Nuevo Import
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Medal, Gem, ShieldCheck, Crown, Trophy, Edit3, Settings, CreditCard, Zap, AlertTriangle, CheckCircle2 } from 'lucide-react';
@@ -17,7 +18,7 @@ import {
   linkParentStripeAccount,
   linkChildDestinationAccount,
   toggleMonthlyPayoutAuthorization
-} from '@/app/actions/stripe'; // Placeholder Stripe actions
+} from '@/app/actions/stripe'; 
 
 // Server Action (conceptual - no real implementation here, just for simulation)
 async function checkAndAwardAchievements(childId: string, completedTaskId: string): Promise<UnlockedAchievement[]> {
@@ -38,7 +39,7 @@ async function checkAndAwardAchievements(childId: string, completedTaskId: strin
 }
 
 
-const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
+const ChildCard: React.FC<{child: Child}> = ({ child: initialChild }) => {
   const { toast } = useToast();
   const [child, setChild] = React.useState<Child>(initialChild);
   const [showAchievements, setShowAchievements] = React.useState(false);
@@ -46,9 +47,14 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
   const [isStripeLoading, setIsStripeLoading] = React.useState(false);
   const avatarInputRef = React.useRef<HTMLInputElement>(null);
 
+  // State for CreateTaskForm
+  const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] = React.useState(false);
+  const [selectedCategoryIdForNewTask, setSelectedCategoryIdForNewTask] = React.useState<string | null>(null);
+  const [selectedCategoryNameForNewTask, setSelectedCategoryNameForNewTask] = React.useState<string | null>(null);
+
 
   React.useEffect(() => {
-    setChild(initialChild); // Actualizar estado si initialChild cambia (ej: datos de Stripe)
+    setChild(initialChild); 
   }, [initialChild]);
 
   React.useEffect(() => {
@@ -142,10 +148,8 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
     avatarInputRef.current?.click();
   };
 
-  // Placeholder Stripe action handlers
   const handleLinkParentStripe = async () => {
     setIsStripeLoading(true);
-    // Asumimos que child.userId es el ID del padre. En una app real, esto vendría del usuario autenticado.
     const parentUserId = child.userId || "parent_placeholder_id";
     const result = await linkParentStripeAccount(parentUserId);
     toast({ title: "Vinculación Stripe (Padre)", description: result.message });
@@ -158,7 +162,6 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
   const handleLinkChildDestination = async () => {
     setIsStripeLoading(true);
     const parentUserId = child.userId || "parent_placeholder_id";
-    // Simular recolección de datos bancarios (en una app real sería un formulario seguro de Stripe)
     const mockAccountDetails = { iban: "ES00123412341234567890" };
     const result = await linkChildDestinationAccount(parentUserId, child.id, mockAccountDetails);
     toast({ title: "Vinculación Cuenta Destino (Hijo)", description: result.message });
@@ -178,6 +181,29 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
       setChild(prev => ({ ...prev, payoutsAuthorized: result.payoutsAuthorized }));
     }
     setIsStripeLoading(false);
+  };
+
+  // Handlers for CreateTaskForm
+  const handleOpenCreateTaskModal = (categoryId: string, categoryName: string) => {
+    setSelectedCategoryIdForNewTask(categoryId);
+    setSelectedCategoryNameForNewTask(categoryName);
+    setIsCreateTaskModalOpen(true);
+  };
+
+  const handleTaskCreated = (newTask: Task, categoryId: string) => {
+    setChild(prevChild => {
+      const updatedCategories = prevChild.categories.map(category => {
+        if (category.id === categoryId) {
+          return {
+            ...category,
+            tasks: [...category.tasks, newTask],
+          };
+        }
+        return category;
+      });
+      return { ...prevChild, categories: updatedCategories };
+    });
+    setIsCreateTaskModalOpen(false); // Close modal after task creation
   };
 
 
@@ -211,153 +237,169 @@ const ChildCard: React.FC<ChildCardProps> = ({ child: initialChild }) => {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-lg rounded-xl overflow-hidden">
-      <CardHeader className="bg-card/50 p-6">
-        <div className="flex items-start space-x-4">
-          <div className="relative group">
-            <Image
-              src={child.avatarUrl}
-              alt={`Avatar de ${child.name}`}
-              width={80}
-              height={80}
-              className="rounded-full border-2 border-primary shadow-sm"
-              data-ai-hint={child.avatarUrl.startsWith('https://placehold.co') ? "child avatar" : undefined}
+    <>
+      <Card className="w-full max-w-2xl mx-auto shadow-lg rounded-xl overflow-hidden">
+        <CardHeader className="bg-card/50 p-6">
+          <div className="flex items-start space-x-4">
+            <div className="relative group">
+              <Image
+                src={child.avatarUrl}
+                alt={`Avatar de ${child.name}`}
+                width={80}
+                height={80}
+                className="rounded-full border-2 border-primary shadow-sm"
+                data-ai-hint={child.avatarUrl.startsWith('https://placehold.co') ? "child avatar" : undefined}
+              />
+              <input
+                type="file"
+                ref={avatarInputRef}
+                onChange={handleAvatarChange}
+                accept="image/*"
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute bottom-0 right-0 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-background/70 hover:bg-background"
+                onClick={triggerAvatarUpload}
+                title="Cambiar avatar"
+              >
+                <Edit3 className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex-grow">
+              <CardTitle className="text-3xl font-bold text-primary">{child.name}</CardTitle>
+              <CardDescription className="text-base text-muted-foreground mt-1">
+                {age} años
+              </CardDescription>
+              <div className="mt-1 flex items-center space-x-2">
+                <LevelIcon />
+                <span className={cn("font-semibold", getLevelColor(child.level))}>
+                  Nivel: {child.level}
+                </span>
+                <span className="text-sm text-muted-foreground">({child.totalAchievementsUnlocked} logros)</span>
+              </div>
+              <div className="mt-3">
+                <p className="text-sm font-medium text-foreground">
+                  Meta de Asignación Mensual: <span className="font-bold text-accent">{formatCurrency(totalPotentialAllowance, child.currency)}</span>
+                </p>
+                <p className="text-lg font-semibold text-foreground">
+                  Ganado Actualmente: <span className="font-bold text-green-600">{formatCurrency(totalEarnedAllowance, child.currency)}</span>
+                </p>
+                <ColoredProgress value={overallProgressPercentage} className="mt-2" heightClassName="h-3" />
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+
+        <Separator />
+
+        <CardContent className="p-6 space-y-6 bg-background">
+          {child.categories.map(category => (
+            <TaskCategory
+              key={category.id}
+              category={category}
+              childMonthlyAllowanceGoal={child.monthlyAllowanceGoal}
+              childCurrency={child.currency}
+              onTaskToggle={handleTaskToggle}
+              onCategoryActivityToggle={handleCategoryActivityToggle}
+              onTaskActivityToggle={handleTaskActivityToggle}
+              onOpenCreateTaskModal={handleOpenCreateTaskModal} // Pasar nueva función
             />
-            <input
-              type="file"
-              ref={avatarInputRef}
-              onChange={handleAvatarChange}
-              accept="image/*"
-              className="hidden"
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute bottom-0 right-0 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-background/70 hover:bg-background"
-              onClick={triggerAvatarUpload}
-              title="Cambiar avatar"
-            >
-              <Edit3 className="h-4 w-4" />
+          ))}
+        </CardContent>
+        <Separator />
+        <CardFooter className="p-6 flex flex-col items-start space-y-4">
+          <div className="w-full flex justify-between items-center">
+            <Button onClick={() => setShowAchievements(!showAchievements)} variant="outline" size="sm">
+              {showAchievements ? 'Ocultar Logros' : 'Mostrar Logros'} ({child.unlockedAchievements.length})
+            </Button>
+            <Button onClick={() => setShowStripeSettings(!showStripeSettings)} variant="outline" size="sm">
+              <Settings className="mr-2 h-4 w-4" />
+              {showStripeSettings ? 'Ocultar Config. Pago' : 'Config. Pago (Stripe)'}
             </Button>
           </div>
-          <div className="flex-grow">
-            <CardTitle className="text-3xl font-bold text-primary">{child.name}</CardTitle>
-            <CardDescription className="text-base text-muted-foreground mt-1">
-              {age} años
-            </CardDescription>
-            <div className="mt-1 flex items-center space-x-2">
-              <LevelIcon />
-              <span className={cn("font-semibold", getLevelColor(child.level))}>
-                Nivel: {child.level}
-              </span>
-              <span className="text-sm text-muted-foreground">({child.totalAchievementsUnlocked} logros)</span>
-            </div>
-             <div className="mt-3">
-              <p className="text-sm font-medium text-foreground">
-                Meta de Asignación Mensual: <span className="font-bold text-accent">{formatCurrency(totalPotentialAllowance, child.currency)}</span>
-              </p>
-              <p className="text-lg font-semibold text-foreground">
-                Ganado Actualmente: <span className="font-bold text-green-600">{formatCurrency(totalEarnedAllowance, child.currency)}</span>
-              </p>
-              <ColoredProgress value={overallProgressPercentage} className="mt-2" heightClassName="h-3" />
-            </div>
-          </div>
-        </div>
-      </CardHeader>
 
-      <Separator />
-
-      <CardContent className="p-6 space-y-6 bg-background">
-        {child.categories.map(category => (
-          <TaskCategory
-            key={category.id}
-            category={category}
-            childMonthlyAllowanceGoal={child.monthlyAllowanceGoal}
-            childCurrency={child.currency}
-            onTaskToggle={handleTaskToggle}
-            onCategoryActivityToggle={handleCategoryActivityToggle}
-            onTaskActivityToggle={handleTaskActivityToggle}
-          />
-        ))}
-      </CardContent>
-      <Separator />
-      <CardFooter className="p-6 flex flex-col items-start space-y-4">
-        <div className="w-full flex justify-between items-center">
-           <Button onClick={() => setShowAchievements(!showAchievements)} variant="outline" size="sm">
-            {showAchievements ? 'Ocultar Logros' : 'Mostrar Logros'} ({child.unlockedAchievements.length})
-          </Button>
-          <Button onClick={() => setShowStripeSettings(!showStripeSettings)} variant="outline" size="sm">
-            <Settings className="mr-2 h-4 w-4" />
-            {showStripeSettings ? 'Ocultar Config. Pago' : 'Config. Pago (Stripe)'}
-          </Button>
-        </div>
-
-        {showAchievements && (
-          <div className="w-full pt-4 border-t">
-            <h3 className="text-xl font-semibold mb-2 text-primary">Logros Desbloqueados</h3>
-            {child.unlockedAchievements.length > 0 ? (
-              <AchievementList achievements={child.unlockedAchievements} />
-            ) : (
-              <p className="text-muted-foreground">Aún no hay logros desbloqueados. ¡Sigue esforzándote!</p>
-            )}
-          </div>
-        )}
-
-        {showStripeSettings && (
-          <div className="w-full pt-4 border-t space-y-3">
-            <h3 className="text-xl font-semibold mb-2 text-primary">Configuración de Pagos (Stripe)</h3>
-            <div className="text-sm space-y-2">
-              <p>
-                <span className="font-medium">ID Cliente Stripe (Padre):</span>{' '}
-                {child.stripeCustomerId ? child.stripeCustomerId : (
-                  <span className="text-muted-foreground italic">No vinculado</span>
-                )}
-              </p>
-              <p>
-                <span className="font-medium">Cuenta Destino (Hijo):</span>{' '}
-                {child.stripeAccountId ? child.stripeAccountId : (
-                  <span className="text-muted-foreground italic">No vinculada</span>
-                )}
-              </p>
-              <p className="flex items-center">
-                <span className="font-medium">Abonos Mensuales Automáticos:</span>{' '}
-                {child.payoutsAuthorized ? (
-                  <CheckCircle2 className="h-5 w-5 text-green-600 ml-2" />
-                ) : (
-                  <AlertTriangle className="h-5 w-5 text-yellow-500 ml-2" />
-                )}
-                <span className={cn("ml-1", child.payoutsAuthorized ? "text-green-700" : "text-yellow-600")}>
-                  {child.payoutsAuthorized ? 'Autorizados' : 'No Autorizados'}
-                </span>
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2 pt-2">
-              {!child.stripeCustomerId && (
-                <Button onClick={handleLinkParentStripe} disabled={isStripeLoading} variant="outline" size="sm">
-                  <CreditCard className="mr-2 h-4 w-4"/>
-                  {isStripeLoading ? "Vinculando..." : "Vincular Cuenta Padre (Stripe)"}
-                </Button>
-              )}
-              {child.stripeCustomerId && !child.stripeAccountId && (
-                 <Button onClick={handleLinkChildDestination} disabled={isStripeLoading} variant="outline" size="sm">
-                  <CreditCard className="mr-2 h-4 w-4"/>
-                  {isStripeLoading ? "Vinculando..." : "Vincular Cuenta Hijo (Stripe)"}
-                </Button>
-              )}
-              {child.stripeCustomerId && child.stripeAccountId && (
-                <Button onClick={handleTogglePayouts} disabled={isStripeLoading} variant="outline" size="sm">
-                  <Zap className="mr-2 h-4 w-4"/>
-                  {isStripeLoading ? "Actualizando..." : (child.payoutsAuthorized ? 'Desautorizar Abonos' : 'Autorizar Abonos')}
-                </Button>
+          {showAchievements && (
+            <div className="w-full pt-4 border-t">
+              <h3 className="text-xl font-semibold mb-2 text-primary">Logros Desbloqueados</h3>
+              {child.unlockedAchievements.length > 0 ? (
+                <AchievementList achievements={child.unlockedAchievements} />
+              ) : (
+                <p className="text-muted-foreground">Aún no hay logros desbloqueados. ¡Sigue esforzándote!</p>
               )}
             </div>
-            <p className="text-xs text-muted-foreground pt-2">
-              Nota: Estas son acciones simuladas. La integración real con Stripe requiere configuración de backend.
-            </p>
-          </div>
-        )}
-      </CardFooter>
-    </Card>
+          )}
+
+          {showStripeSettings && (
+            <div className="w-full pt-4 border-t space-y-3">
+              <h3 className="text-xl font-semibold mb-2 text-primary">Configuración de Pagos (Stripe)</h3>
+              <div className="text-sm space-y-2">
+                <p>
+                  <span className="font-medium">ID Cliente Stripe (Padre):</span>{' '}
+                  {child.stripeCustomerId ? child.stripeCustomerId : (
+                    <span className="text-muted-foreground italic">No vinculado</span>
+                  )}
+                </p>
+                <p>
+                  <span className="font-medium">Cuenta Destino (Hijo):</span>{' '}
+                  {child.stripeAccountId ? child.stripeAccountId : (
+                    <span className="text-muted-foreground italic">No vinculada</span>
+                  )}
+                </p>
+                <p className="flex items-center">
+                  <span className="font-medium">Abonos Mensuales Automáticos:</span>{' '}
+                  {child.payoutsAuthorized ? (
+                    <CheckCircle2 className="h-5 w-5 text-green-600 ml-2" />
+                  ) : (
+                    <AlertTriangle className="h-5 w-5 text-yellow-500 ml-2" />
+                  )}
+                  <span className={cn("ml-1", child.payoutsAuthorized ? "text-green-700" : "text-yellow-600")}>
+                    {child.payoutsAuthorized ? 'Autorizados' : 'No Autorizados'}
+                  </span>
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                {!child.stripeCustomerId && (
+                  <Button onClick={handleLinkParentStripe} disabled={isStripeLoading} variant="outline" size="sm">
+                    <CreditCard className="mr-2 h-4 w-4"/>
+                    {isStripeLoading ? "Vinculando..." : "Vincular Cuenta Padre (Stripe)"}
+                  </Button>
+                )}
+                {child.stripeCustomerId && !child.stripeAccountId && (
+                  <Button onClick={handleLinkChildDestination} disabled={isStripeLoading} variant="outline" size="sm">
+                    <CreditCard className="mr-2 h-4 w-4"/>
+                    {isStripeLoading ? "Vinculando..." : "Vincular Cuenta Hijo (Stripe)"}
+                  </Button>
+                )}
+                {child.stripeCustomerId && child.stripeAccountId && (
+                  <Button onClick={handleTogglePayouts} disabled={isStripeLoading} variant="outline" size="sm">
+                    <Zap className="mr-2 h-4 w-4"/>
+                    {isStripeLoading ? "Actualizando..." : (child.payoutsAuthorized ? 'Desautorizar Abonos' : 'Autorizar Abonos')}
+                  </Button>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground pt-2">
+                Nota: Estas son acciones simuladas. La integración real con Stripe requiere configuración de backend.
+              </p>
+            </div>
+          )}
+        </CardFooter>
+      </Card>
+      
+      {/* Formulario para crear nueva tarea */}
+      {selectedCategoryIdForNewTask && (
+        <CreateTaskForm
+          open={isCreateTaskModalOpen}
+          onOpenChange={setIsCreateTaskModalOpen}
+          categoryId={selectedCategoryIdForNewTask}
+          categoryName={selectedCategoryNameForNewTask || ''}
+          childId={child.id}
+          userId={child.userId || 'parent_placeholder_id'} // Usar child.userId como placeholder
+          onTaskCreated={handleTaskCreated}
+        />
+      )}
+    </>
   );
 };
 

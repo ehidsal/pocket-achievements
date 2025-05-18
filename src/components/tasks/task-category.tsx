@@ -7,19 +7,21 @@ import TaskItem from './task-item';
 import ColoredProgress from '@/components/shared/colored-progress';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn, formatCurrency } from '@/lib/utils';
 import { iconComponents } from '@/app/page'; 
-import { HelpCircle } from 'lucide-react'; 
+import { HelpCircle, PlusCircle } from 'lucide-react'; 
 
 interface TaskCategoryProps {
   category: Category;
   childMonthlyAllowanceGoal: number;
-  childCurrency: 'EUR' | 'USD'; // Nueva prop para la moneda del niño
+  childCurrency: 'EUR' | 'USD';
   onTaskToggle: (categoryId: string, taskId: string, completed: boolean) => void;
   onCategoryActivityToggle: (categoryId: string, isActive: boolean) => void;
   onTaskActivityToggle: (categoryId: string, taskId: string, taskIsActive: boolean) => void;
+  onOpenCreateTaskModal: (categoryId: string, categoryName: string) => void; // Nueva prop
 }
 
 const TaskCategory: React.FC<TaskCategoryProps> = ({ 
@@ -28,7 +30,8 @@ const TaskCategory: React.FC<TaskCategoryProps> = ({
   childCurrency,
   onTaskToggle, 
   onCategoryActivityToggle,
-  onTaskActivityToggle
+  onTaskActivityToggle,
+  onOpenCreateTaskModal // Nueva prop
 }) => {
   const { id: categoryId, name, iconName, tasks, weight, isActive: isCategoryActive } = category;
   const categoryCheckboxId = React.useId();
@@ -89,6 +92,17 @@ const TaskCategory: React.FC<TaskCategoryProps> = ({
                 disabled={!isCategoryActive} 
               />
             ))}
+          </div>
+          <div className="mt-4 text-right">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onOpenCreateTaskModal(categoryId, name)}
+              disabled={!isCategoryActive}
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Añadir Tarea
+            </Button>
           </div>
         </CardContent>
       )}

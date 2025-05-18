@@ -7,7 +7,6 @@ import type { Task } from '@/types';
 // import { firestore } from '@/lib/firebase-admin'; // Asumiendo que tienes un archivo de configuración para admin
 
 // Asegúrate de que Firebase Admin esté inicializado, usualmente en un archivo como 'src/lib/firebase-admin.ts'
-// Ejemplo de inicialización (solo debe ejecutarse una vez):
 /*
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -51,14 +50,18 @@ export async function createTaskAction(input: CreateTaskInput): Promise<{ succes
   console.log("CategoryId:", categoryId);
   console.log("Task Details:", { taskName, taskValue, taskFrequency });
 
+  // Simulación de generación de ID
   const newTaskId = `user_task_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   
-  const newTask: Omit<Task, 'id' | 'completed' | 'isActive'> & { creadaPorUsuario: true, frequency: 'diaria' | 'semanal' } = {
+  // Simulación de la nueva tarea que se guardaría
+  const newTaskData: Omit<Task, 'id' | 'completed' | 'isActive'> & { creadaPorUsuario: true, frequency: 'diaria' | 'semanal' } = {
     name: taskName,
     value: taskValue,
     frequency: taskFrequency,
     creadaPorUsuario: true,
   };
+  console.log("Simulated new task data to be saved:", newTaskData);
+
 
   /*
   // Lógica real con Firebase Admin SDK:
@@ -70,7 +73,7 @@ export async function createTaskAction(input: CreateTaskInput): Promise<{ succes
       return { success: false, message: "Hijo no encontrado." };
     }
 
-    const childData = childDoc.data() as import('@/types').Child;
+    const childData = childDoc.data() as import('@/types').Child; // Asegúrate de tener el tipo Child importado
     const categories = childData.categories || [];
 
     const categoryIndex = categories.findIndex(cat => cat.id === categoryId);
@@ -78,12 +81,13 @@ export async function createTaskAction(input: CreateTaskInput): Promise<{ succes
       return { success: false, message: "Categoría no encontrada." };
     }
 
+    // Asegúrate que la tarea tenga todos los campos requeridos por el tipo Task
     const finalNewTask: Task = {
       id: newTaskId, // Genera un ID único, por ejemplo con uuid
       name: taskName,
-      completed: false,
+      completed: false, // Por defecto no completada
       value: taskValue,
-      isActive: true,
+      isActive: true, // Por defecto activa
       frequency: taskFrequency,
       creadaPorUsuario: true,
     };
@@ -101,5 +105,7 @@ export async function createTaskAction(input: CreateTaskInput): Promise<{ succes
   */
 
   // Simulación de éxito
+  await new Promise(resolve => setTimeout(resolve, 500)); // Simular pequeña demora de red
   return { success: true, message: "Tarea creada exitosamente (simulado).", taskId: newTaskId };
 }
+
