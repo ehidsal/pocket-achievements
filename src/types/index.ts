@@ -5,6 +5,7 @@ export interface Task {
   name: string;
   completed: boolean;
   value: number; // Represents the contribution of this task to the category's allowance portion
+  isActive: boolean; // Indicates if the task is currently active/available within its category
 }
 
 export interface Category {

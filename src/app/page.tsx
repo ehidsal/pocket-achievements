@@ -20,9 +20,9 @@ const childrenData: Child[] = [
         weight: 0.4,
         isActive: true,
         tasks: [
-          { id: 'task1_1_1', name: 'Terminar la tarea a tiempo', completed: false, value: 10 },
-          { id: 'task1_1_2', name: 'Leer durante 20 minutos', completed: true, value: 5 },
-          { id: 'task1_1_3', name: 'Preparar la mochila para el día siguiente', completed: false, value: 5 },
+          { id: 'task1_1_1', name: 'Terminar la tarea a tiempo', completed: false, value: 10, isActive: true },
+          { id: 'task1_1_2', name: 'Leer durante 20 minutos', completed: true, value: 5, isActive: true },
+          { id: 'task1_1_3', name: 'Preparar la mochila para el día siguiente', completed: false, value: 5, isActive: true },
         ],
       },
       {
@@ -32,9 +32,9 @@ const childrenData: Child[] = [
         weight: 0.3,
         isActive: true,
         tasks: [
-          { id: 'task1_2_1', name: 'Hacer la cama todas las mañanas', completed: false, value: 10 },
-          { id: 'task1_2_2', name: 'Ayudar a poner la mesa para la cena', completed: false, value: 8 },
-          { id: 'task1_2_3', name: 'Ordenar los juguetes antes de dormir', completed: true, value: 7 },
+          { id: 'task1_2_1', name: 'Hacer la cama todas las mañanas', completed: false, value: 10, isActive: true },
+          { id: 'task1_2_2', name: 'Ayudar a poner la mesa para la cena', completed: false, value: 8, isActive: true },
+          { id: 'task1_2_3', name: 'Ordenar los juguetes antes de dormir', completed: true, value: 7, isActive: true },
         ],
       },
       {
@@ -44,8 +44,8 @@ const childrenData: Child[] = [
         weight: 0.15,
         isActive: true,
         tasks: [
-          { id: 'task1_3_1', name: 'Compartir juguetes con hermano/amigo', completed: false, value: 10 },
-          { id: 'task1_3_2', name: 'Decir "por favor" y "gracias"', completed: true, value: 5 },
+          { id: 'task1_3_1', name: 'Compartir juguetes con hermano/amigo', completed: false, value: 10, isActive: true },
+          { id: 'task1_3_2', name: 'Decir "por favor" y "gracias"', completed: true, value: 5, isActive: true },
         ],
       },
       {
@@ -55,8 +55,8 @@ const childrenData: Child[] = [
         weight: 0.15,
         isActive: true,
         tasks: [
-          { id: 'task1_4_1', name: 'Escuchar a la primera cuando se le pida', completed: false, value: 15 },
-          { id: 'task1_4_2', name: 'Manejar la frustración con calma', completed: false, value: 10 },
+          { id: 'task1_4_1', name: 'Escuchar a la primera cuando se le pida', completed: false, value: 15, isActive: true },
+          { id: 'task1_4_2', name: 'Manejar la frustración con calma', completed: false, value: 10, isActive: true },
         ],
       },
     ],
@@ -75,9 +75,9 @@ const childrenData: Child[] = [
         weight: 0.5,
         isActive: true,
         tasks: [
-          { id: 'task2_1_1', name: 'Completar la hoja de trabajo de matemáticas', completed: true, value: 10 },
-          { id: 'task2_1_2', name: 'Estudiar para el examen de ciencias', completed: false, value: 15 },
-          { id: 'task2_1_3', name: 'Practicar instrumento musical durante 30 minutos', completed: false, value: 10 },
+          { id: 'task2_1_1', name: 'Completar la hoja de trabajo de matemáticas', completed: true, value: 10, isActive: true },
+          { id: 'task2_1_2', name: 'Estudiar para el examen de ciencias', completed: false, value: 15, isActive: true },
+          { id: 'task2_1_3', name: 'Practicar instrumento musical durante 30 minutos', completed: false, value: 10, isActive: true },
         ],
       },
       {
@@ -87,9 +87,9 @@ const childrenData: Child[] = [
         weight: 0.3,
         isActive: true,
         tasks: [
-          { id: 'task2_2_1', name: 'Pasear al perro', completed: false, value: 10 },
-          { id: 'task2_2_2', name: 'Ayudar a desempacar las compras', completed: true, value: 5 },
-          { id: 'task2_2_3', name: 'Mantener la habitación limpia', completed: false, value: 15 },
+          { id: 'task2_2_1', name: 'Pasear al perro', completed: false, value: 10, isActive: true },
+          { id: 'task2_2_2', name: 'Ayudar a desempacar las compras', completed: true, value: 5, isActive: true },
+          { id: 'task2_2_3', name: 'Mantener la habitación limpia', completed: false, value: 15, isActive: true },
         ],
       },
       {
@@ -99,8 +99,8 @@ const childrenData: Child[] = [
         weight: 0.2,
         isActive: true,
         tasks: [
-          { id: 'task2_3_1', name: 'Practicar una nueva habilidad durante 15 minutos', completed: false, value: 10 },
-          { id: 'task2_3_2', name: 'Ayudar a un miembro de la familia sin que se lo pidan', completed: false, value: 10 },
+          { id: 'task2_3_1', name: 'Practicar una nueva habilidad durante 15 minutos', completed: false, value: 10, isActive: true },
+          { id: 'task2_3_2', name: 'Ayudar a un miembro de la familia sin que se lo pidan', completed: false, value: 10, isActive: true },
         ],
       },
     ],
@@ -113,7 +113,7 @@ export default function HomePage() {
       <header className="mb-10 text-center">
         <div className="inline-flex items-center space-x-3">
           <Coins className="h-12 w-12 text-primary" />
-          <h1 className="text-5xl font-bold tracking-tight text-gray-800">
+          <h1 className="text-5xl font-bold tracking-tight text-foreground">
             Logros de <span className="text-primary">Bolsillo</span>
           </h1>
         </div>

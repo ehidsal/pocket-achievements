@@ -7,7 +7,6 @@ import { calculateAge } from '@/lib/utils';
 import TaskCategory from '@/components/tasks/task-category';
 import ColoredProgress from '@/components/shared/colored-progress';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { User } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 interface ChildCardProps {
@@ -43,17 +42,35 @@ const ChildCard: React.FC<ChildCardProps> = ({ child }) => {
       )
     );
   };
+
+  const handleTaskActivityToggle = (categoryId: string, taskId: string, taskIsActive: boolean) => {
+    setInternalCategories(prevCategories =>
+      prevCategories.map(category =>
+        category.id === categoryId
+          ? {
+              ...category,
+              tasks: category.tasks.map(task =>
+                task.id === taskId ? { ...task, isActive: taskIsActive } : task
+              ),
+            }
+          : category
+      )
+    );
+  };
   
   const totalPotentialAllowance = child.monthlyAllowanceGoal;
   let totalEarnedAllowance = 0;
 
   internalCategories.forEach(category => {
-    if (category.isActive) { // Solo considerar categorías activas
-      const completedTasksValue = category.tasks.reduce((sum, task) => sum + (task.completed ? task.value : 0), 0);
-      const totalTasksValue = category.tasks.reduce((sum, task) => sum + task.value, 0);
-      // El progreso de la categoría se calcula sobre el valor total de sus tareas, no sobre el peso.
-      const categoryTaskCompletionProgress = totalTasksValue > 0 ? (completedTasksValue / totalTasksValue) : 0;
-      // La contribución de esta categoría a la asignación total es su peso * progreso de tareas * meta mensual.
+    if (category.isActive) { 
+      const activeTasks = category.tasks.filter(task => task.isActive);
+      const completedActiveTasksValue = activeTasks.reduce((sum, task) => sum + (task.completed ? task.value : 0), 0);
+      const totalValueFromActiveTasks = activeTasks.reduce((sum, task) => sum + task.value, 0);
+      
+      const categoryTaskCompletionProgress = totalValueFromActiveTasks > 0 
+        ? (completedActiveTasksValue / totalValueFromActiveTasks) 
+        : 0;
+      
       totalEarnedAllowance += child.monthlyAllowanceGoal * category.weight * categoryTaskCompletionProgress;
     }
   });
@@ -100,6 +117,7 @@ const ChildCard: React.FC<ChildCardProps> = ({ child }) => {
             childMonthlyAllowanceGoal={child.monthlyAllowanceGoal}
             onTaskToggle={handleTaskToggle}
             onCategoryActivityToggle={handleCategoryActivityToggle}
+            onTaskActivityToggle={handleTaskActivityToggle}
           />
         ))}
       </CardContent>

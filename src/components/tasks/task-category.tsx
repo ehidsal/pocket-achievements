@@ -15,60 +15,71 @@ interface TaskCategoryProps {
   childMonthlyAllowanceGoal: number;
   onTaskToggle: (categoryId: string, taskId: string, completed: boolean) => void;
   onCategoryActivityToggle: (categoryId: string, isActive: boolean) => void;
+  onTaskActivityToggle: (categoryId: string, taskId: string, taskIsActive: boolean) => void;
 }
 
-const TaskCategory: React.FC<TaskCategoryProps> = ({ category, childMonthlyAllowanceGoal, onTaskToggle, onCategoryActivityToggle }) => {
-  const { id: categoryId, name, icon: Icon, tasks, weight, isActive } = category;
+const TaskCategory: React.FC<TaskCategoryProps> = ({ 
+  category, 
+  childMonthlyAllowanceGoal, 
+  onTaskToggle, 
+  onCategoryActivityToggle,
+  onTaskActivityToggle
+}) => {
+  const { id: categoryId, name, icon: Icon, tasks, weight, isActive: isCategoryActive } = category;
   const categoryCheckboxId = React.useId();
 
-  const completedTasks = tasks.filter(task => task.completed).length;
-  const totalTasks = tasks.length;
+  const activeTasks = tasks.filter(task => task.isActive);
+  const completedActiveTasks = activeTasks.filter(task => task.completed);
+
+  const sumOfCompletedActiveTaskValues = completedActiveTasks.reduce((sum, task) => sum + task.value, 0);
+  const sumOfAllActiveTaskValues = activeTasks.reduce((sum, task) => sum + task.value, 0);
   
-  // Calculate progress only if the category is active and has tasks
-  const categoryProgress = isActive && totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+  const categoryTaskCompletionProgress = isCategoryActive && sumOfAllActiveTaskValues > 0 
+    ? (sumOfCompletedActiveTaskValues / sumOfAllActiveTaskValues) * 100 
+    : 0;
 
   const maxCategoryEarnings = childMonthlyAllowanceGoal * weight;
-  // Calculate earned amount only if the category is active
-  const earnedInCategory = isActive ? maxCategoryEarnings * (categoryProgress / 100) : 0;
+  const earnedInCategory = isCategoryActive ? maxCategoryEarnings * (categoryTaskCompletionProgress / 100) : 0;
 
   return (
-    <Card className={cn("mb-4 shadow-md transition-opacity duration-300", !isActive && "opacity-60")}>
+    <Card className={cn("mb-4 shadow-md transition-opacity duration-300", !isCategoryActive && "opacity-60")}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className='flex items-center space-x-2'>
             <Checkbox
               id={`${categoryCheckboxId}-${categoryId}`}
-              checked={isActive}
+              checked={isCategoryActive}
               onCheckedChange={(checked) => onCategoryActivityToggle(categoryId, !!checked)}
               aria-labelledby={`label-cat-${categoryCheckboxId}-${categoryId}`}
               className="mr-2"
             />
-            <Icon className={cn("h-6 w-6", isActive ? "text-primary" : "text-muted-foreground")} />
+            <Icon className={cn("h-6 w-6", isCategoryActive ? "text-primary" : "text-muted-foreground")} />
             <Label htmlFor={`${categoryCheckboxId}-${categoryId}`} id={`label-cat-${categoryCheckboxId}-${categoryId}`} className="cursor-pointer">
-              <CardTitle className={cn("text-xl font-semibold", !isActive && "text-muted-foreground line-through")}>{name}</CardTitle>
+              <CardTitle className={cn("text-xl font-semibold", !isCategoryActive && "text-muted-foreground line-through")}>{name}</CardTitle>
             </Label>
           </div>
-          {isActive && (
+          {isCategoryActive && (
             <Badge variant="secondary" className="text-sm">
-              {completedTasks}/{totalTasks} tareas
+              {completedActiveTasks.length}/{activeTasks.length} tareas activas
             </Badge>
           )}
         </div>
-        <CardDescription className={cn("mt-1 text-xs", !isActive && "text-muted-foreground")}>
-           Potencial: ${isActive ? maxCategoryEarnings.toFixed(2) : '0.00'} | Ganado: ${earnedInCategory.toFixed(2)}
-           {!isActive && " (Categoría desactivada)"}
+        <CardDescription className={cn("mt-1 text-xs", !isCategoryActive && "text-muted-foreground")}>
+           Potencial: ${isCategoryActive ? maxCategoryEarnings.toFixed(2) : '0.00'} | Ganado: ${earnedInCategory.toFixed(2)}
+           {!isCategoryActive && " (Categoría desactivada)"}
         </CardDescription>
       </CardHeader>
-      {isActive && (
+      {isCategoryActive && (
         <CardContent>
-          <ColoredProgress value={categoryProgress} className="mb-3" heightClassName="h-2" />
+          <ColoredProgress value={categoryTaskCompletionProgress} className="mb-3" heightClassName="h-2" />
           <div className="space-y-1">
             {tasks.map(task => (
               <TaskItem
                 key={task.id}
                 task={task}
                 onTaskToggle={(taskId, completed) => onTaskToggle(categoryId, taskId, completed)}
-                disabled={!isActive}
+                onTaskActivityToggle={(taskId, taskIsActive) => onTaskActivityToggle(categoryId, taskId, taskIsActive)}
+                disabled={!isCategoryActive} // TaskItem is disabled if the whole category is disabled
               />
             ))}
           </div>
