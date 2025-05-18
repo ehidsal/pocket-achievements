@@ -42,16 +42,21 @@ export async function createTaskAction(input: CreateTaskInput): Promise<{ succes
       return { success: false, message: "Hijo no encontrado." };
     }
 
-    const childData = childDoc.data() as Child;
-    const categories = childData.categories || [];
+    const childData = childDoc.data() as Child | undefined; // Cast to Child | undefined
+    const categories = childData?.categories || [];
+
+    // Add a check to ensure 'categories' is an array
+    if (!Array.isArray(categories)) {
+      console.error(`El campo 'categories' para el hijo ${childId} (usuario ${userId}) no es un array.`);
+      return { success: false, message: "Error del servidor: Formato de datos incorrecto para las categorías del hijo." };
+    }
 
     const categoryIndex = categories.findIndex(cat => cat.id === categoryId);
     if (categoryIndex === -1) {
       return { success: false, message: "Categoría no encontrada." };
     }
 
-    // Generar un ID único para la nueva tarea (Firestore lo hace automáticamente si no se especifica .doc(id))
-    // o puedes usar una librería como uuid
+    // Generar un ID único para la nueva tarea
     const newTaskId = firestore.collection('temp_ids').doc().id; // Manera sencilla de obtener un ID único
 
     const finalNewTask: Task = {
@@ -67,9 +72,11 @@ export async function createTaskAction(input: CreateTaskInput): Promise<{ succes
     // Clonamos las categorías para evitar modificar directamente el objeto obtenido de Firestore
     const updatedCategories = categories.map((cat, index) => {
       if (index === categoryIndex) {
+        // Ensure cat.tasks is an array before spreading
+        const currentTasks = Array.isArray(cat.tasks) ? cat.tasks : [];
         return {
           ...cat,
-          tasks: [...(cat.tasks || []), finalNewTask], // Añade la nueva tarea al array de tareas
+          tasks: [...currentTasks, finalNewTask], // Añade la nueva tarea al array de tareas
         };
       }
       return cat;
@@ -87,3 +94,4 @@ export async function createTaskAction(input: CreateTaskInput): Promise<{ succes
     return { success: false, message: `Error del servidor: ${errorMessage}` };
   }
 }
+
