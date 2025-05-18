@@ -34,7 +34,7 @@ export interface Category {
 }
 
 export interface Child {
-  id: string;
+  id:string;
   userId?: string;
   name: string;
   birthDate: string;
@@ -42,11 +42,38 @@ export interface Child {
   avatarUrl: string;
   categories: Category[];
   currency: 'EUR' | 'USD';
-  level: ChildLevel; // Nuevo campo
-  unlockedAchievements: UnlockedAchievement[]; // Nuevo campo
-  totalAchievementsUnlocked: number; // Nuevo campo
+  level: ChildLevel;
+  unlockedAchievements: UnlockedAchievement[];
+  totalAchievementsUnlocked: number;
 }
 
 export interface IconMap {
   [key: string]: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
+}
+
+// New types for Payment History
+export interface EvaluationCategoryDetail {
+  categoryId: string;
+  categoryName: string;
+  iconName: string;
+  earned: number;
+  potential: number;
+  compliancePercentage: number; // Specific to this category for the week
+}
+
+export interface EvaluationEntry {
+  id: string; // Unique ID for the evaluation period (e.g., week)
+  childId: string;
+  weekStartDate: string; // ISO string, e.g., "2024-05-20"
+  compliancePercentage: number; // Overall compliance for the week (0-100)
+  generatedAllowance: number; // Amount earned this week
+  currency: 'EUR' | 'USD';
+  predominantCategory?: EvaluationCategoryDetail; // Optional: The category that contributed most or was focused on
+  categoryDetails: EvaluationCategoryDetail[]; // Detailed breakdown per category
+}
+
+export interface HistoryFiltersState {
+  dateRange?: { from?: Date; to?: Date };
+  selectedCategoryId?: string;
+  minCompliance: number; // 0-100
 }

@@ -1,9 +1,10 @@
 
 "use client";
 
+import Link from 'next/link';
 import ChildCard from '@/components/children/child-card';
 import type { Child } from '@/types';
-import { Coins, BookOpen, Home as HomeIcon, Users, Heart, HelpCircle, Award, Target, TrendingUp, CheckCircle } from 'lucide-react';
+import { Coins, BookOpen, Home as HomeIcon, Users, Heart, HelpCircle, Award, Target, TrendingUp, CheckCircle, History } from 'lucide-react';
 import type { IconMap } from '@/types';
 
 // It's important that iconComponents includes all icons used by name in child data or achievement data
@@ -18,9 +19,10 @@ export const iconComponents: IconMap = {
   Target: Target, // For achievements
   TrendingUp: TrendingUp, // For achievements
   CheckCircle: CheckCircle, // For achievements
+  History: History, // For History page link
 };
 
-const childrenData: Child[] = [
+export const childrenData: Child[] = [
   {
     id: 'child1',
     name: 'Alex Miller',
@@ -146,6 +148,12 @@ export default function HomePage() {
         <p className="mt-3 text-lg text-muted-foreground">
           Empoderando a los niños con responsabilidad, una tarea a la vez.
         </p>
+         <div className="mt-6">
+          <Link href="/history" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90">
+            <History className="mr-2 h-5 w-5" />
+            Ver Historial de Pagos
+          </Link>
+        </div>
       </header>
 
       <div className="space-y-12">
