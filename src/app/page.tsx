@@ -152,7 +152,6 @@ export default function HomePage() {
               Pago<span className="text-primary">metro</span>
             </h1>
           </div>
-          {/* ThemeToggleButton removido de aquí */}
         </div>
         <p className="text-lg text-muted-foreground text-center">
           Cumple, Cobra, Ahorra.
