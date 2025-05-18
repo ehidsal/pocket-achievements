@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning> {/* suppressHydrationWarning es recomendado por next-themes */}
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
+<body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
