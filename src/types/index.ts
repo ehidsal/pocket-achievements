@@ -95,3 +95,12 @@ export interface Payout {
   stripeTransferId?: string; // ID de la transferencia o payout en Stripe
   errorMessage?: string; // En caso de fallo
 }
+
+// Tipos para Chatbot Dialogflow
+export interface ChatMessage {
+  id: string;
+  text: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
+  quickReplies?: string[];
+}
